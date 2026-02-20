@@ -114,6 +114,18 @@ function updatePanelWithDiffs(name, newStats, preset) {
     });
 }
 
+const CONTEXT_LIMIT = 30;
+
+function buildChatTranscript() {
+    const { chat } = SillyTavern.getContext();
+    if (!chat || !Array.isArray(chat)) return '';
+    const recent = chat.slice(-CONTEXT_LIMIT);
+    return recent
+        .filter(msg => msg.mes && msg.name)
+        .map(msg => `${msg.name}: ${msg.mes}`)
+        .join('\n');
+}
+
 export async function evaluateAllCharacters(fresh) {
     const rosterList = Roster.getRoster();
     if (!isEnabled() || rosterList.length === 0) return;
@@ -123,7 +135,7 @@ export async function evaluateAllCharacters(fresh) {
     }
     evalInProgress = true;
 
-    const { generateQuietPrompt, saveSettingsDebounced } = SillyTavern.getContext();
+    const { generateRaw, saveSettingsDebounced } = SillyTavern.getContext();
     const preset = getActivePreset();
 
     for (const entry of rosterList) {
@@ -136,10 +148,11 @@ export async function evaluateAllCharacters(fresh) {
         currentStats: getStatsForName(entry.name, preset),
     }));
 
-    const prompt = Presets.buildCombinedEvalPrompt(characters, preset, fresh);
+    const transcript = buildChatTranscript();
+    const prompt = Presets.buildCombinedEvalPrompt(characters, preset, fresh, transcript);
 
     try {
-        const result = await generateQuietPrompt({ quietPrompt: prompt });
+        const result = await generateRaw({ prompt });
         const match = result.match(/\{[\s\S]*\}/);
         if (!match) {
             console.warn('[CharacterSheet] Could not parse combined LLM response:', result);

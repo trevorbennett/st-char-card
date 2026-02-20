@@ -78,7 +78,7 @@ export function clampStat(value, preset) {
  * Build a combined prompt that evaluates stats AND titles for all characters.
  * Static instructions first (cacheable prefix), dynamic data last.
  */
-export function buildCombinedEvalPrompt(characters, preset, fresh) {
+export function buildCombinedEvalPrompt(characters, preset, fresh, chatTranscript) {
     const statNames = preset.stats.join(', ');
     const exampleStats = Object.fromEntries(preset.stats.map(s => [s, preset.defaults[s]]));
 
@@ -96,7 +96,7 @@ Rules:
 
     const modeInstruction = fresh
         ? 'This is a brand new conversation. Evaluate all characters from scratch based on their descriptions and the opening scenario. Do NOT use default or sample values.'
-        : 'Based on everything that has happened in this conversation so far, update the stats accordingly.';
+        : 'Based on the recent conversation below, update the stats accordingly.';
 
     const charDescriptions = characters.map(c => {
         const who = c.isUser ? `"${c.name}" (the player/user, the protagonist)` : `"${c.name}"`;
@@ -105,10 +105,19 @@ Rules:
         return `- ${who}: ${statList}`;
     }).join('\n');
 
-    return `${staticPrefix}
+    let prompt = `${staticPrefix}
 
 ${modeInstruction}
 
 Characters:
 ${charDescriptions}`;
+
+    if (chatTranscript) {
+        prompt += `
+
+Recent conversation:
+${chatTranscript}`;
+    }
+
+    return prompt;
 }
