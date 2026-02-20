@@ -11,14 +11,29 @@
     let messageCount = 0;
 
     function loadScript(filename, globalKey) {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             const existing = globalKey.split('.').reduce((o, k) => o?.[k], window);
             if (existing) { resolve(existing); return; }
-            const script = document.createElement('script');
-            script.src = `/${EXTENSION_PATH}/${filename}`;
-            script.onload = () => resolve(globalKey.split('.').reduce((o, k) => o?.[k], window));
-            script.onerror = () => reject(new Error(`Failed to load ${filename}`));
-            document.head.appendChild(script);
+            try {
+                const resp = await fetch(`/${EXTENSION_PATH}/${filename}`);
+                if (!resp.ok) throw new Error(`HTTP ${resp.status} loading ${filename}`);
+                const code = await resp.text();
+                const blob = new Blob([code], { type: 'application/javascript' });
+                const url = URL.createObjectURL(blob);
+                const script = document.createElement('script');
+                script.src = url;
+                script.onload = () => {
+                    URL.revokeObjectURL(url);
+                    resolve(globalKey.split('.').reduce((o, k) => o?.[k], window));
+                };
+                script.onerror = () => {
+                    URL.revokeObjectURL(url);
+                    reject(new Error(`Failed to execute ${filename}`));
+                };
+                document.head.appendChild(script);
+            } catch (err) {
+                reject(err);
+            }
         });
     }
 
