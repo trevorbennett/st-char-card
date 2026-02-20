@@ -1,0 +1,138 @@
+#hello-world-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 16px;
+    background: var(--SmartThemeBlurTintColor, rgba(0, 0, 0, 0.6));
+    color: var(--SmartThemeBodyColor, #ccc);
+    font-size: 14px;
+    width: calc((100% - var(--sheldWidth)) / 2);
+    overflow-y: auto;
+    word-break: break-word;
+    text-align: center;
+    box-sizing: border-box;
+    transition: padding 0.3s ease, background 0.3s ease;
+}
+
+#hello-world-panel.hw-panel-collapsed {
+    background: transparent;
+    padding: 0;
+    pointer-events: none;
+    overflow: visible;
+}
+
+#hello-world-panel.hw-panel-collapsed .hw-toggle-bar {
+    pointer-events: auto;
+}
+
+#hello-world-panel img {
+    width: calc(100% - 8px);
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+#hello-world-panel span {
+    font-weight: bold;
+}
+
+.hw-toggle-bar {
+    width: 100%;
+    cursor: pointer;
+    text-align: center;
+    font-size: 14px;
+    padding: 6px 0;
+    opacity: 0.6;
+    user-select: none;
+    transition: opacity 0.15s;
+    margin-top: auto;
+}
+
+.hw-toggle-bar:hover {
+    opacity: 1;
+}
+
+.hw-collapsible {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    max-height: 1000px;
+    opacity: 1;
+}
+
+.hw-collapsible.hw-collapsed {
+    max-height: 0;
+    opacity: 0;
+}
+
+.hw-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    width: 100%;
+    margin-top: 4px;
+}
+
+.hw-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.hw-stat label {
+    font-size: 11px;
+    font-weight: bold;
+    opacity: 0.7;
+}
+
+.hw-stat input {
+    width: 48px;
+    text-align: center;
+    padding: 2px 4px;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+    background: var(--SmartThemeBlurTintColor, rgba(0, 0, 0, 0.4));
+    color: var(--SmartThemeBodyColor, #ccc);
+    font-size: 13px;
+    -moz-appearance: textfield;
+}
+
+.hw-stat input::-webkit-outer-spin-button,
+.hw-stat input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.hw-stat-up input {
+    border-color: #4caf50;
+    color: #4caf50;
+}
+
+.hw-stat-down input {
+    border-color: #f44336;
+    color: #f44336;
+}
+
+.hw-diff {
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.hw-diff-up {
+    color: #4caf50;
+}
+
+.hw-diff-down {
+    color: #f44336;
+}
